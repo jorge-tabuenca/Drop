@@ -11,6 +11,9 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+		//Ahorrar bateria descativando el acelerometro y la brujula
+		config.useAccelerometer = false;
+		config.useCompass = false;
 		initialize(new Drop(), config);
 	}
 }
