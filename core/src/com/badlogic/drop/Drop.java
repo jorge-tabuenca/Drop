@@ -1,13 +1,16 @@
 package com.badlogic.drop;
 
+import java.util.Iterator;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -15,27 +18,35 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import java.util.Iterator;
-
 public class Drop extends ApplicationAdapter {
 	private Texture dropImage;
 	private Texture bucketImage;
+	private Texture endDroplet;
 	private Sound dropSound;
 	private Music rainMusic;
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Rectangle bucket;
 
+	private BitmapFont font;
+	private int score = 0;
+
 	// use Array because the ArrayList generates trash
 	private Array<Rectangle> raindrops;
 	// last waterDrop, its a time value so we use long
 	private long lastDropTime;
+
+	private Texture backTexture;
 	
 	@Override
 	public void create () {
 		// load the images for the droplet and the bucket, 64x64 pixels each
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
 		bucketImage = new Texture(Gdx.files.internal("bucket.png"));
+
+		endDroplet = new Texture(Gdx.files.internal("endDroplet.png"));
+
+		backTexture = new Texture(Gdx.files.internal("fondo.png"));
 
 		// load the drop sound effect and the rain background "music"
 		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
@@ -61,16 +72,24 @@ public class Drop extends ApplicationAdapter {
 
 		raindrops = new Array<Rectangle>();
 		spawnRaindrop();
+
+		font = new BitmapFont();
+		font.setColor(Color.WHITE);
+		font.getData().setScale(2);
 	}
 
 	@Override
 	public void render () {
 		// first make the windows color dark-blue
 		// second begin OpenGL to clean the window
-		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		//Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		camera.update();
+
+		batch.begin();
+		batch.draw(backTexture, 0, 0, 800, 480);
+		batch.end();
 
 		// render the bucket
 		batch.setProjectionMatrix(camera.combined);
@@ -97,19 +116,29 @@ public class Drop extends ApplicationAdapter {
 		// verify the time pas from the last waterDrop
 		if(TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
 
-		// make waterDrop ove and in the bot of the screen deleted
+		// make waterDrop move and in the bot of the screen deleted
 		for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext(); ) {
 			Rectangle raindrop = iter.next();
 			raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-			if(raindrop.y + 64 < 0) iter.remove();
+			if(raindrop.y + 64 < 0){
+				iter.remove();
+			}
 
 		// make noise if the  waterDrop touch the bucket
 		// overlaps search if too rectangles are touching
 			if(raindrop.overlaps(bucket)) {
 				dropSound.play();
+
+				score ++;
+				Gdx.app.log("Score", String.valueOf(score));
+
 				iter.remove();
 			}
 		}
+
+		batch.begin();
+		font.draw(batch,"Score: " + String.valueOf(score), 5, 460);
+		batch.end();
 
 		// render waterDrops
 		batch.begin();
