@@ -1,6 +1,7 @@
 package com.badlogic.drop;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -8,12 +9,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Drop extends Game {
 
 	public SpriteBatch batch;
-	public BitmapFont font;
+	public BitmapFont fontBig;
+	public BitmapFont fontSmall;
 
 	public void create() {
 		batch = new SpriteBatch();
 		//Use LibGDX's default Arial font.
-		font = new BitmapFont();
+		fontBig = new BitmapFont();
+		fontBig.getData().setScale(2);
+		fontSmall = new BitmapFont();
+		fontSmall.getData().setScale(1);
 		this.setScreen(new MainMenuScreen(this));
 	}
 
@@ -23,6 +28,7 @@ public class Drop extends Game {
 
 	public void dispose() {
 		batch.dispose();
-		font.dispose();
+		fontBig.dispose();
+		fontSmall.dispose();
 	}
 }

@@ -2,17 +2,26 @@ package com.badlogic.drop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 
 public class MainMenuScreen implements Screen {
 
     final Drop game;
+    Texture backTexture;
+    Music mainMenuMusic;
 
     OrthographicCamera camera;
 
     public MainMenuScreen(final Drop game) {
         this.game = game;
+
+        backTexture = new Texture(Gdx.files.internal("mainMenuBack.png"));
+
+        mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal("mainMenuMusic.mp3"));
+        mainMenuMusic.setLooping(true);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
@@ -21,7 +30,7 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void show() {
-
+        mainMenuMusic.play();
     }
 
     @Override
@@ -34,8 +43,12 @@ public class MainMenuScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
-        game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
+        game.batch.draw(backTexture, 0, 0, 800, 480);
+        game.batch.end();
+
+        game.batch.begin();
+        game.fontBig.draw(game.batch, "Welcome to Drop!!! ", 300, 400);
+        game.fontSmall.draw(game.batch, "Tap anywhere to begin!", 350, 100);
         game.batch.end();
 
         if (Gdx.input.isTouched()) {
@@ -66,6 +79,6 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        mainMenuMusic.dispose();
     }
 }
