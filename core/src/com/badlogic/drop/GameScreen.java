@@ -127,11 +127,14 @@ public class GameScreen implements Screen {
         // the screen or that hit the bucket. In the later case we increase the
         // value our drops counter and add a sound effect.
         Iterator<Rectangle> iter = raindrops.iterator();
+
         while (iter.hasNext()) {
             Rectangle raindrop = iter.next();
             raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-            if (raindrop.y + 64 < 0)
-                iter.remove();
+            if (raindrop.y + 64 < 0) {
+                game.setScreen(new GameOverScreen(game, dropsGathered));
+                this.dispose();
+            }
             if (raindrop.overlaps(bucket)) {
                 dropsGathered++;
                 dropSound.play();
